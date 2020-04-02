@@ -35,29 +35,20 @@ d3.csv("assets/data/data.csv")
     stateData.forEach(function(data) {
       data.poverty = +data.poverty;
       data.healthcare = +data.healthcare;
-      // data.povertyMoe = +data.povertyMoe;
-      // data.age = +data.age;
-      // data.ageMoe = +data.ageMoe;
-      // data.income = +data.income;
-      // data.incomeMoe = +data.incomeMoe;
-      // data.healthcareLow = +data.healthcareLow;
-      // data.healthcareHigh = +data.healthcareHigh;
-      // data.obesity = +data.obesity;
-      // data.obesityLow = +data.obesityLow;
-      // data.obesityHigh = +data.obesityHigh;
-      // data.smokes = +data.smokes;
-      // data.smokesLow = +data.smokesLow;
-      // data.smokesHigh = +data.smokesHigh;
     });
 
     // xLinearScale function above csv import
-    var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(stateData, d => d.healthcare) * 1.8, d3.max(stateData, d => d.poverty)*1.2] )
+    var xLinearScale = d3
+      .scaleLinear()
+      .domain([
+        d3.min(stateData, d => d.healthcare) * 1.8,
+        d3.max(stateData, d => d.poverty) * 1.2
+      ])
       .range([0, chartWidth]);
 
-
-    var yLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(stateData, d => d.healthcare *1.2)])
+    var yLinearScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(stateData, d => d.healthcare * 1.2)])
       .range([chartHeight, 0]);
 
     // Create axis functions
@@ -65,12 +56,12 @@ d3.csv("assets/data/data.csv")
     var leftAxis = d3.axisLeft(yLinearScale);
 
     // append x and y axis
-    chartGroup.append("g")
+    chartGroup
+      .append("g")
       .attr("transform", `translate(0, ${chartHeight})`)
       .call(bottomAxis);
 
-    chartGroup.append("g")
-      .call(leftAxis);
+    chartGroup.append("g").call(leftAxis);
 
     /*Create the circle group for each state */
     var circles = chartGroup.selectAll("g circle").data(stateData);
@@ -96,39 +87,62 @@ d3.csv("assets/data/data.csv")
       .attr("y", d => yLinearScale(d.healthcare))
       .classed("stateText", true)
       .text(d => d.abbr)
-      .attr("font-size", r * 0.9);
+      .attr("font-size", r * 0.95);
 
     //Initialize tool tip
-    var toolTip = d3.tip()
-    .attr("class", "d3-tip")
-    .offset([20, -20])
-    .html(function(d) {
-       return (`${d.poverty}${d.healthcare}`);
-    });
+    var toolTip = d3
+      .tip()
+      .attr("class", "d3-tip")
+      .offset([40, -20])
+      .html(function(d) {
+        return `d.state<br>Poverty: ${d.poverty}<br> Lacks Healthcare: ${d.healthcare}`;
+      });
 
     svg.call(toolTip);
 
-    circlesGroup.on("click", function(data) {
-      toolTip.show(data, this);
-      console.log(this +"clicked!")
-      console.log(toolTip)
+    circlesGroup
+      .on("mouseover", function(data) {
+        toolTip.show(data, this);
+        console.log(this + "clicked!");
+        console.log(toolTip);
       })
-        // onmouseout event
+      // onmouseout event
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
 
+    // var tip = d3
+    //   .select("body")
+    //   .append("div")
+    //   .attr("class", "d3-tip")
+    //   .html("I am a tooltip...")
+    //   .style("border", "1px solid steelblue")
+    //   .style("padding", "5px")
+    //   .style("position", "absolute")
+    //   .style("display", "none")
+    //   .on("mouseover", function(d, i) {
+    //     tip.transition().duration(0);
+    //   })
+    //   .on("mouseout", function(d, i) {
+    //     tip.style("display", "none");
+    //   });
+
     // Create axes labels
-    chartGroup.append("text")
+    chartGroup
+      .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 0 - margin.left + 20)
-      .attr("x", 0 - (chartHeight -100))
+      .attr("x", 0 - (chartHeight - 100))
       .attr("dy", "1em")
       .attr("class", "axisText")
       .text("Lacks Healthcare(%)");
 
-    chartGroup.append("text")
-      .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top -10})`)
+    chartGroup
+      .append("text")
+      .attr(
+        "transform",
+        `translate(${chartWidth / 2}, ${chartHeight + margin.top - 10})`
+      )
       .attr("class", "axisText")
       .text("In Poverty(%)");
   })
