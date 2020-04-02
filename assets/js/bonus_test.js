@@ -29,7 +29,6 @@ var chosenYAxis = "healthcare";
 
 // function used for updating x-scale var upon click on axis label
 function xScale(stateData, chosenXAxis) {
-  // create scales
   var xLinearScale = d3.scaleLinear()
     .domain([d3.min(stateData, d => d[chosenXAxis]) * 0.8,
       d3.max(stateData, d => d[chosenXAxis]) * 1.2
@@ -51,44 +50,45 @@ function renderAxes(newXScale, xAxis) {
   return xAxis;
 }
 
-// function used for updating circles group with a transition to
-// new circles
+// function used for updating circles group with a transition to new circles
 function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 
-  circlesGroup.transition()
-    .duration(1000)
-    .attr("cx", d => newXScale(d[chosenXAxis]));
-
-  return circlesGroup;
-}
+    circlesGroup.transition()
+      .duration(1000)
+      .attr("cx", d => newXScale(d[chosenXAxis]));
+  
+    return circlesGroup;
+  }
 
 // function used for updating circles group with new tooltip
-// function updateToolTip(chosenXAxis, circlesGroup) {
+function updateToolTip(chosenXAxis, circlesGroup) {
 
-//   var label;
+  var label;
 
-//   if (chosenXAxis === "poverty") {
-//     label = "Hair Length:";
-//   }
-//   else {
-//     label = "# of Albums:";
-//   }
+  if (chosenXAxis === "poverty") {
+    label = "poverty:";
+  }
+  else {
+    label = "age:";
+  }
 
-//   var toolTip = d3.tip()
-//     .attr("class", "tooltip")
-//     .offset([80, -60]);
+  var toolTip = d3.tip()
+    .attr("class", "d3-tip")
+    .offset([40, -20])
+    .html(function(d) {
+        return `${d.state}<br>${chosenXAxis}: ${d.poverty}% <br>${chosenYAxis}: ${d.healthcare}%`;
+      });
 
-//   circlesGroup.call(toolTip);
+  circlesGroup.call(toolTip);
 
-//   circlesGroup.on("mouseover", function(data) {
-//     toolTip.show(data);
-//   })
-//     // onmouseout event
-//     .on("mouseout", function(data, index) {
-//       toolTip.hide(data);
-//     });
-
-
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.show(data);
+  })
+    // onmouseout event
+    .on("mouseout", function(data, index) {
+      toolTip.hide(data);
+    });
+};
 // Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(stateData) {
 
@@ -139,16 +139,16 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 10)
+    .attr("r", r)
     .classed("stateCircle", true);
 
-    circlesGroup
-      .append("text")
-      .attr("x", d => xLinearScale(d[chosenXAxis]))
-      .attr("y", d => yLinearScale(d[chosenYAxis]))
-      .classed("stateText", true)
-      .text(d => d.abbr)
-      .attr("font-size", r * 0.9);
+    // circlesGroup
+    //   .append("text")
+    //   .attr("x", d => xLinearScale(d[chosenXAxis]))
+    //   .attr("y", d => yLinearScale(d[chosenYAxis]))
+    //   .classed("stateText", true)
+    //   .text(d => d.abbr)
+    //   .attr("font-size", r * 0.9);
 
   // Create group for  2 x- axis labels
   var labelsGroup = chartGroup.append("g")
@@ -159,14 +159,14 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .attr("y", 20)
     .attr("value", "poverty") // value to grab for event listener
     .classed("active", true)
-    .text("poverty");
+    .text("In Poverty(%)");
 
   var ageLabel = labelsGroup.append("text")
     .attr("x", 0)
     .attr("y", 40)
     .attr("value", "age") // value to grab for event listener
     .classed("inactive", true)
-    .text("Age");
+    .text("Age(Median)");
 
   // append y axis
   chartGroup.append("text")
@@ -175,10 +175,10 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
     .classed("axis-text", true)
-    .text("Number of Billboard 500 Hits");
+    .text("Lacks Healthcare(%)");
 
-  // updateToolTip function above csv import
-//   var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+  // updateToolTip function above csv import -- This is not working!
+//   var circles = updateToolTip(chosenXAxis, circlesGroup);
 
   // x axis labels event listener
   labelsGroup.selectAll("text")
@@ -190,7 +190,7 @@ d3.csv("assets/data/data.csv").then(function(stateData) {
         // replaces chosenXAxis with value
         chosenXAxis = value;
 
-        // console.log(chosenXAxis)
+        console.log(chosenXAxis)
 
         // functions here found above csv import
         // updates x scale for new data

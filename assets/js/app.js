@@ -95,7 +95,7 @@ d3.csv("assets/data/data.csv")
       .attr("class", "d3-tip")
       .offset([40, -20])
       .html(function(d) {
-        return `d.state<br>Poverty: ${d.poverty}<br> Lacks Healthcare: ${d.healthcare}`;
+        return `${d.state}<br>Poverty: ${d.poverty}% <br>Lacks Healthcare: ${d.healthcare}%`;
       });
 
     svg.call(toolTip);
@@ -103,29 +103,11 @@ d3.csv("assets/data/data.csv")
     circlesGroup
       .on("mouseover", function(data) {
         toolTip.show(data, this);
-        console.log(this + "clicked!");
-        console.log(toolTip);
       })
       // onmouseout event
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
-
-    // var tip = d3
-    //   .select("body")
-    //   .append("div")
-    //   .attr("class", "d3-tip")
-    //   .html("I am a tooltip...")
-    //   .style("border", "1px solid steelblue")
-    //   .style("padding", "5px")
-    //   .style("position", "absolute")
-    //   .style("display", "none")
-    //   .on("mouseover", function(d, i) {
-    //     tip.transition().duration(0);
-    //   })
-    //   .on("mouseout", function(d, i) {
-    //     tip.style("display", "none");
-    //   });
 
     // Create axes labels
     chartGroup
